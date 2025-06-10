@@ -1,5 +1,5 @@
-import dotenv from 'dotenv';
-import app from './src/app.js';
+const dotenv = require('dotenv');
+const app = require('./src/app'); // Assuming you have an app.js file that exports your Express app
 
 dotenv.config();
 

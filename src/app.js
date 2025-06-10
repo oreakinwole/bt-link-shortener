@@ -1,6 +1,6 @@
-import express from "express";
-import urlShortenerRoutes from "./routes/urlShortener.js";
-import errorHandler from "./middlewares/errorHandler.js";
+const express = require("express");
+const urlShortenerRoutes = require("./routes/urlShortener.js");
+const errorHandler = require("./middlewares/errorHandler.js");
 
 const app = express();
 app.use(express.json());
@@ -16,4 +16,4 @@ app.use((req, res) => {
   });
 });
 
-export default app;
+module.exports = app;

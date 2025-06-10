@@ -1,5 +1,4 @@
-import crypto from 'crypto';
-
+const crypto = require("crypto");
 
 // In-memory storage, In production we would use a Redis cluster
 const urlStore = new Map();
@@ -25,7 +24,7 @@ function isValidUrl(string) {
   }
 }
 
-export const shorten = (req, res, next) => {
+const shorten = (req, res, next) => {
   const { url } = req.body;
 
   if (!url) {
@@ -70,7 +69,7 @@ export const shorten = (req, res, next) => {
   });
 };
 
-export const getFullUrl = (req, res) => {
+const getFullUrl = (req, res) => {
   const { shortCode } = req.params;
   const originalUrl = urlStore.get(shortCode);
 
@@ -84,7 +83,7 @@ export const getFullUrl = (req, res) => {
   res.redirect(301, originalUrl);
 };
 
-export const getUrlInfo = (req, res) => {
+const getUrlInfo = (req, res) => {
   const { shortCode } = req.params;
   const originalUrl = urlStore.get(shortCode);
 
@@ -100,4 +99,10 @@ export const getUrlInfo = (req, res) => {
     originalUrl: originalUrl,
     shortUrl: `http://ln.er/${shortCode}`,
   });
+};
+
+module.exports = {
+  shorten,
+  getFullUrl,
+  getUrlInfo,
 };
