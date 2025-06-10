@@ -10,6 +10,6 @@ router.post("/", shorten);
 router.get("/:shortCode", getFullUrl);
 
 // Get info on the URL
-app.get('/info/:shortCode', getUrlInfo);
+router.get('/info/:shortCode', getUrlInfo);
 
 export default router;

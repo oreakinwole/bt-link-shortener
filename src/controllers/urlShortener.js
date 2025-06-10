@@ -1,4 +1,5 @@
-const crypto = require("crypto");
+import crypto from 'crypto';
+
 
 // In-memory storage, In production we would use a Redis cluster
 const urlStore = new Map();
