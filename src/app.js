@@ -1,14 +1,11 @@
-const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 3000;
+import express from 'express';
+import urlShortenerRoutes from './routes/urlShortener.js';
+import errorHandler from './middlewares/errorHandler.js';
 
+const app = express();
 app.use(express.json());
 
-app.get('/', (req, res) => {
-  res.send('Hello, Express!');
-});
+app.use('/api/shorten', urlShortenerRoutes);
+app.use(errorHandler);
 
-
-app.listen(PORT, () => {
-  console.log(`Server running at http://localhost:${PORT}`);
-});
+export default app;
