@@ -1,71 +1,84 @@
-const crypto = require('crypto');
-const { promisify } = require('util');
+const crypto = require("crypto");
 
-// In-memory storage for high performance (production would use Redis cluster)
+// In-memory storage, In production we would use a Redis cluster
 const urlStore = new Map();
 
-// Base62 encoding for shorter URLs
-const BASE62_CHARS = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz';
+const BASE62_CH =
+  "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
 function generateShortCode() {
-    const buffer = crypto.randomBytes(6);
-    let result = '';
-    for (let i = 0; i < 6; i++) {
-        result += BASE62_CHARS[buffer[i] % 62];
-    }
-    return result;
+  const buffer = crypto.randomBytes(6);
+  let result = "";
+  for (let i = 0; i < 6; i++) {
+    result += BASE62_CH[buffer[i] % 62];
+  }
+  return result;
 }
 
 function isValidUrl(string) {
-    try {
-        const url = new URL(string);
-        return url.protocol === 'http:' || url.protocol === 'https:';
-    } catch {
-        return false;
-    }
+  try {
+    const url = new URL(string);
+    return url.protocol === "http:" || url.protocol === "https:";
+  } catch {
+    return false;
+  }
 }
 
-export const shorten = async (req, res, next) => {
- const { url } = req.body;
-    
-    if (!url) {
-        return res.status(400).json({ 
-            error: 'URL is required',
-            example: { url: 'https://www.example.com' }
-        });
-    }
-    
-    if (!isValidUrl(url)) {
-        return res.status(400).json({ 
-            error: 'Invalid URL format. Must start with http:// or https://',
-            provided: url
-        });
-    }
-    
-    // Check if URL already exists
-    for (const [code, storedUrl] of urlStore) {
-        if (storedUrl === url) {
-            return res.json({
-                shortUrl: `http://do.co/${code}`,
-                originalUrl: url,
-                shortCode: code,
-                cached: true
-            });
-        }
-    }
-    
-    // Generate new short code
-    let shortCode;
-    do {
-        shortCode = generateShortCode();
-    } while (urlStore.has(shortCode));
-    
-    urlStore.set(shortCode, url);
-    
-    res.status(201).json({
-        shortUrl: `http://do.co/${shortCode}`,
-        originalUrl: url,
-        shortCode: shortCode,
-        cached: false
+export const shorten = (req, res, next) => {
+  const { url } = req.body;
+
+  if (!url) {
+    return res.status(400).json({
+      error: "URL is required",
+      example: { url: "https://www.your-url.com" },
     });
+  }
+
+  if (!isValidUrl(url)) {
+    return res.status(400).json({
+      error: "Invalid URL format. Must start with http:// or https://",
+      provided: url,
+    });
+  }
+
+  // Check if URL already exists
+  for (const [code, storedUrl] of urlStore) {
+    if (storedUrl === url) {
+      return res.json({
+        shortUrl: `http://ln.er/${code}`,
+        originalUrl: url,
+        shortCode: code,
+        cached: true,
+      });
+    }
+  }
+
+  // Generate new short code
+  let shortCode;
+  do {
+    shortCode = generateShortCode();
+  } while (urlStore.has(shortCode));
+
+  urlStore.set(shortCode, url);
+
+  res.status(201).json({
+    shortUrl: `http://ln.er/${shortCode}`,
+    originalUrl: url,
+    shortCode: shortCode,
+    cached: false,
+  });
+};
+
+export const getFullUrl = (req, res) => {
+  const { shortCode } = req.params;
+  const originalUrl = urlStore.get(shortCode);
+
+  if (!originalUrl) {
+    return res.status(404).json({
+      error: "Short URL not found",
+      shortCode: shortCode,
+    });
+  }
+
+  res.redirect(301, originalUrl);
 };
