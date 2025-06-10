@@ -82,3 +82,21 @@ export const getFullUrl = (req, res) => {
 
   res.redirect(301, originalUrl);
 };
+
+export const getUrlInfo = (req, res) => {
+  const { shortCode } = req.params;
+  const originalUrl = urlStore.get(shortCode);
+
+  if (!originalUrl) {
+    return res.status(404).json({
+      error: "Short URL not found",
+      shortCode: shortCode,
+    });
+  }
+
+  res.json({
+    shortCode: shortCode,
+    originalUrl: originalUrl,
+    shortUrl: `http://ln.er/${shortCode}`,
+  });
+};
